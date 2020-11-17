@@ -1,33 +1,26 @@
-import { Table, Col } from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Route, Switch } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import MyNavbar from './components/Navbar';
+import LcmStatus from './pages/Status';
+import Fota from './pages/FOTA';
 
-function App() {
-  return (
-      <Col lg={12} md={8} sm={8}>
-        <Table striped bordered hover>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Jacob</td>
-              <td>Thornton</td>
-              <td>@fat</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td colSpan="2">Larry the Bird</td>
-              <td>@twitter</td>
-            </tr>
-          </tbody>
-        </Table>
-      </Col>
-  );
+
+class App extends Component {
+  render() {
+    return (
+      <div id="wrapper">
+        <MyNavbar />
+        <main role="main">
+            <Route exact path='/Lcm_Status' component={LcmStatus} />
+            {/* default route */}
+            <Route exact path='/' component={Fota} />
+          </main>
+      </div>
+    );
+  }
+
 }
 
 export default App;
