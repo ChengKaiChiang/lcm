@@ -35,13 +35,14 @@ function LcmStatus() {
         setCount(items);
     }
 
-    function test1() {
+    function Firmware_update() {
         const items = [...count];
         console.log(items.length);
-        let model = document.getElementById('model_select').value;
+        let model_id = document.getElementById('model_select').selectedOptions[0].id;
+        console.log(document.getElementById('model_select').selectedOptions[0].id);
         var data = new FormData();
         data.append("id", JSON.stringify(count));
-        data.append("model", model);
+        data.append("model", model_id);
         if (items.length !== 0) {
             fetch('http://localhost/lcm/api/public/index.php/updateModel', {
                 method: 'POST',
@@ -60,12 +61,12 @@ function LcmStatus() {
     return (
         <div>
             <Row>
-                <Button variant="primary" className="offset-2 mb-3" onClick={test1}>Firmware Upload</Button>{' '}
+                <Button variant="primary" className="offset-2 mb-3" onClick={Firmware_update}>Firmware Upload</Button>{' '}
                 <Form.Control as="select" className="col-md-1 col-sm-1 ml-3" id="model_select">
                     {
                         data.map(data => {
                             return (
-                                <option>{data.model}</option>
+                                <option id={data.id}>{data.model}</option>
                             )
                         })
                     }
@@ -91,34 +92,34 @@ function LcmStatus() {
                             </td>
                             <td>
                                 <label for="materialUnchecked"> ID：4</label>
-                                <input type="checkbox" class="checkbox offset-1" />
+                                <input type="checkbox" class="checkbox offset-1" id="4" onChange={(e) => onChangeorder(e)} />
                             </td>
                             <td>
                                 <label for="materialUnchecked"> ID：5</label>
-                                <input type="checkbox" class="checkbox offset-1" />
+                                <input type="checkbox" class="checkbox offset-1" id="5" onChange={(e) => onChangeorder(e)} />
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 <label for="materialUnchecked"> ID：6</label>
-                                <input type="checkbox" class="checkbox offset-1" />
+                                <input type="checkbox" class="checkbox offset-1" id="6" onChange={(e) => onChangeorder(e)} />
 
                             </td>
                             <td>
                                 <label for="materialUnchecked"> ID：7</label>
-                                <input type="checkbox" class="checkbox offset-1" />
+                                <input type="checkbox" class="checkbox offset-1" id="7" onChange={(e) => onChangeorder(e)} />
                             </td>
                             <td>
                                 <label for="materialUnchecked"> ID：8</label>
-                                <input type="checkbox" class="checkbox offset-1" />
+                                <input type="checkbox" class="checkbox offset-1" id="8" onChange={(e) => onChangeorder(e)} />
                             </td>
                             <td>
                                 <label for="materialUnchecked"> ID：9</label>
-                                <input type="checkbox" class="checkbox offset-1" />
+                                <input type="checkbox" class="checkbox offset-1" id="9" onChange={(e) => onChangeorder(e)} />
                             </td>
                             <td>
                                 <label for="materialUnchecked"> ID：10</label>
-                                <input type="checkbox" class="checkbox offset-1" />
+                                <input type="checkbox" class="checkbox offset-1" id="10" onChange={(e) => onChangeorder(e)} />
                             </td>
                         </tr>
 
