@@ -5,7 +5,7 @@ import ReactPlayer from 'react-player';
 import axios from "axios";
 
 function LcmStatus() {
-
+    console.log('invoke function component');
     var a = () => {
         return parse(showData);
     }
@@ -19,6 +19,7 @@ function LcmStatus() {
     const [showData, setshowData] = useState("");
 
     useEffect(() => {
+        console.log("aaaa");
         fetch('http://localhost/lcm/api/public/index.php/lcm')
             .then(res => res.json())
             .then(
@@ -31,7 +32,7 @@ function LcmStatus() {
                         if (result[0].data[x + 1] !== undefined)
                             a[i] = { 'ip1': result[0].data[x], 'ip2': result[0].data[x + 1] };
                         else
-                            a[i] = { 'ip1': result[0].data[x], 'ip2': 0 };
+                            a[i] = { 'ip1': result[0].data[x], 'ip2': undefined };
                         x += 2;
                     }
                     console.log(a);
@@ -71,7 +72,7 @@ function LcmStatus() {
         return () => clearInterval(timer);
     });
 
-    function test1(e) {
+    function changNowID(e) {
         // console.log(e.target.id);
         setip(e.target.id);
         console.log(nowIP);
@@ -88,7 +89,7 @@ function LcmStatus() {
                                     <Row>
                                         <Col>
                                             <span class="h1">No{data.ip1.id}.</span>
-                                            <button type="button" class="offset-1 btn btn-success btn-circle btn-xl" id={data.ip1.ip} onClick={(e) => test1(e)}></button>
+                                            <button type="button" class="offset-1 btn btn-success btn-circle btn-xl" id={data.ip1.ip} onClick={(e) => changNowID(e)}></button>
                                             <span class="h1 offset-1">{data.ip1.model}</span>
                                         </Col>
                                     </Row>
@@ -97,7 +98,7 @@ function LcmStatus() {
                                     <Row>
                                         <Col>
                                             <span class="h1">No{data.ip2.id}.</span>
-                                            <button type="button" class="offset-1 btn btn-success btn-circle btn-xl" id={data.ip2.ip} onClick={(e) => test1(e)}></button>
+                                            <button type="button" class="offset-1 btn btn-success btn-circle btn-xl" id={data.ip2.ip} onClick={(e) => changNowID(e)}></button>
                                             <span class="h1 offset-1">{data.ip2.model}</span>
                                         </Col>
                                     </Row>
