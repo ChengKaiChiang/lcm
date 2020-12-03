@@ -3,11 +3,10 @@ import React, { useState, useEffect } from 'react';
 import './css/FOTA.css';
 import swal from 'sweetalert';
 
-function LcmStatus() {
-
+function FirmwareUpdate() {
     const [count, setCount] = useState([]);
-
     const [data, setdata] = useState([]);
+    const [model_data, setmodeldata] = useState([]);
 
     useEffect(() => {
         fetch('http://localhost/lcm/api/public/index.php/model')
@@ -15,6 +14,16 @@ function LcmStatus() {
             .then(
                 (result) => {
                     console.log(result[0].data);
+                    setmodeldata(result[0].data);
+                }
+            )
+    }, []);
+
+    useEffect(() => {
+        fetch('http://localhost/lcm/api/public/index.php/lcm')
+            .then(res => res.json())
+            .then(
+                (result) => {
                     setdata(result[0].data);
                 }
             )
@@ -32,7 +41,41 @@ function LcmStatus() {
                 }
             });
         }
+
+        console.log(items);
         setCount(items);
+    }
+
+    const data_process = (data) => {
+        var lists = [];
+        for (let x of data) {
+            lists.push(
+                <td>
+                    <label> No.{x.id}</label>
+                    <input type="checkbox" className="checkbox offset-1" id={x.id} onChange={(e) => onChangeorder(e)} />
+                </td>
+            )
+        }
+        return (lists)
+    }
+
+    const show_all_LCM = (data) => {
+        let dataProcess = data_process(data);
+        let show_lists = [];
+        let length = Math.ceil(dataProcess.length / 5);
+        for (let t = 0; t < length; t++) {
+            show_lists.push(
+                <tr key={t}>
+                    {dataProcess[(t * 5)]}
+                    {dataProcess[(t * 5) + 1]}
+                    {dataProcess[(t * 5) + 2]}
+                    {dataProcess[(t * 5) + 3]}
+                    {dataProcess[(t * 5) + 4]}
+                </tr>
+            )
+        }
+
+        return (show_lists)
     }
 
     function Firmware_update() {
@@ -40,7 +83,7 @@ function LcmStatus() {
         console.log(items.length);
         let model_id = document.getElementById('model_select').selectedOptions[0].id;
         console.log(document.getElementById('model_select').selectedOptions[0].id);
-        var data = new FormData();
+        let data = new FormData();
         data.append("id", JSON.stringify(count));
         data.append("model", model_id);
         if (items.length !== 0) {
@@ -64,9 +107,9 @@ function LcmStatus() {
                 <Button variant="primary" className="offset-2 mb-3" onClick={Firmware_update}>Firmware Upload</Button>{' '}
                 <Form.Control as="select" className="col-md-1 col-sm-1 ml-3" id="model_select">
                     {
-                        data.map(data => {
+                        model_data.map(data => {
                             return (
-                                <option id={data.id}>{data.model}</option>
+                                <option key={data.id} id={data.id}>{data.model}</option>
                             )
                         })
                     }
@@ -76,53 +119,7 @@ function LcmStatus() {
             <Row>
                 <Table striped bordered className="col-md-8 col-sm-9 col-8 offset-2">
                     <tbody>
-                        <tr>
-                            <td>
-                                <label for="materialUnchecked"> ID：1</label>
-                                <input type="checkbox" class="checkbox offset-1" id="1" onChange={(e) => onChangeorder(e)} />
-
-                            </td>
-                            <td>
-                                <label for="materialUnchecked"> ID：2</label>
-                                <input type="checkbox" class="checkbox offset-1" id="2" onChange={(e) => onChangeorder(e)} />
-                            </td>
-                            <td>
-                                <label for="materialUnchecked"> ID：3</label>
-                                <input type="checkbox" class="checkbox offset-1" id="3" onChange={(e) => onChangeorder(e)} />
-                            </td>
-                            <td>
-                                <label for="materialUnchecked"> ID：4</label>
-                                <input type="checkbox" class="checkbox offset-1" id="4" onChange={(e) => onChangeorder(e)} />
-                            </td>
-                            <td>
-                                <label for="materialUnchecked"> ID：5</label>
-                                <input type="checkbox" class="checkbox offset-1" id="5" onChange={(e) => onChangeorder(e)} />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="materialUnchecked"> ID：6</label>
-                                <input type="checkbox" class="checkbox offset-1" id="6" onChange={(e) => onChangeorder(e)} />
-
-                            </td>
-                            <td>
-                                <label for="materialUnchecked"> ID：7</label>
-                                <input type="checkbox" class="checkbox offset-1" id="7" onChange={(e) => onChangeorder(e)} />
-                            </td>
-                            <td>
-                                <label for="materialUnchecked"> ID：8</label>
-                                <input type="checkbox" class="checkbox offset-1" id="8" onChange={(e) => onChangeorder(e)} />
-                            </td>
-                            <td>
-                                <label for="materialUnchecked"> ID：9</label>
-                                <input type="checkbox" class="checkbox offset-1" id="9" onChange={(e) => onChangeorder(e)} />
-                            </td>
-                            <td>
-                                <label for="materialUnchecked"> ID：10</label>
-                                <input type="checkbox" class="checkbox offset-1" id="10" onChange={(e) => onChangeorder(e)} />
-                            </td>
-                        </tr>
-
+                        {show_all_LCM(data)}
                     </tbody>
                 </Table>
             </Row>
@@ -130,4 +127,4 @@ function LcmStatus() {
     );
 }
 
-export default LcmStatus;
+export default FirmwareUpdate;
