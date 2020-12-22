@@ -7,7 +7,7 @@ function LcmStatus() {
     const [color_num, setnum] = useState(0);
     const [quantity, setquantity] = useState(0);
     const [nowIP, setip] = useState("");
-    const [data, setdata] = useState([]);
+    const [lcminfo, setinfo] = useState([]);
     const [showData, setshowData] = useState("");
 
     useEffect(() => {
@@ -21,14 +21,14 @@ function LcmStatus() {
     }, []);
 
     const getLCMData = (first) => {
-        fetch('http://localhost/lcm/api/public/index.php/lcm')
+        fetch('http://localhost/lcm/laravel_api/public/lcm')
             .then(res => res.json())
             .then(
                 (result) => {
-                    setquantity(result[0].data.length);
+                    setquantity(result.data.length);
                     if (first)
-                        setip(result[0].data[0].ip);
-                    setdata(result[0].data);
+                        setip(result.data[0].ip);
+                    setinfo(result.data);
                 }
             )
     }
@@ -50,15 +50,15 @@ function LcmStatus() {
 
             console.log(color_num + ", " + color[color_num] + ", " + nowIP);
 
-            fetch('http://localhost/lcm/api/public/index.php/getVoltage', {
+            fetch('http://localhost/lcm/laravel_api/public/getStatus', {
                 method: 'POST',
                 body: post_data
             })
                 .then(res => res.json())
                 .then(
                     (result) => {
-                        let show_str = "Color:" + color[color_num] + "<br/> LCM Power:" + result[0].data[0].lcm_power + "V <br/> LCM Current:" + result[0].data[0].lcm_current + "mA <br/>" +
-                            " Back Light Power:" + result[0].data[0].backlight_power + "V <br/> Back Light Current:" + result[0].data[0].backlight_current + "mA";
+                        let show_str = "Color:" + color[color_num] + "<br/> LCM Power:" + result[0].lcm_power + "V <br/> LCM Current:" + result[0].lcm_current + "mA <br/>" +
+                            " Back Light Power:" + result[0].backlight_power + "V <br/> Back Light Current:" + result[0].backlight_current + "mA";
 
                         setshowData(show_str);
                     }
@@ -74,17 +74,31 @@ function LcmStatus() {
     const data_process = (data) => {
         var lists = [];
         for (let x of data) {
-            lists.push(
-                <td>
-                    <Row>
-                        <Col>
-                            <span className="h1">No.{x.id}</span>
-                            <button type="button" className="offset-1 btn btn-success btn-circle btn-xl" id={x.ip} onClick={(e) => changNowID(e)}></button>
-                            <span className="h1 offset-1">{x.model}</span>
-                        </Col>
-                    </Row>
-                </td>
-            )
+            if (x.lcmmodel === null) {
+                lists.push(
+                    <td>
+                        <Row>
+                            <Col>
+                                <span className="h1">No.{x.id}</span>
+                                <button type="button" className="offset-1 btn btn-success btn-circle btn-xl" id={x.ip} onClick={(e) => changNowID(e)}></button>
+                                <span className="h1 offset-1">null</span>
+                            </Col>
+                        </Row>
+                    </td>
+                )
+            } else {
+                lists.push(
+                    <td>
+                        <Row>
+                            <Col>
+                                <span className="h1">No.{x.id}</span>
+                                <button type="button" className="offset-1 btn btn-success btn-circle btn-xl" id={x.ip} onClick={(e) => changNowID(e)}></button>
+                                <span className="h1 offset-1">{x.lcmmodel.model_name}</span>
+                            </Col>
+                        </Row>
+                    </td>
+                )
+            }
         }
         return (lists)
     }
@@ -111,7 +125,7 @@ function LcmStatus() {
             <div className="col-md-7">
                 <Table striped bordered >
                     <tbody>
-                        {show_all_LCM(data)}
+                        {show_all_LCM(lcminfo)}
                     </tbody>
                 </Table>
             </div>

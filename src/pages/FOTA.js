@@ -5,26 +5,25 @@ import swal from 'sweetalert';
 
 function FirmwareUpdate() {
     const [count, setCount] = useState([]);
-    const [data, setdata] = useState([]);
+    const [lcminfo, setinfo] = useState([]);
     const [model_data, setmodeldata] = useState([]);
 
     useEffect(() => {
-        fetch('http://localhost/lcm/api/public/index.php/model')
+        fetch('http://localhost/lcm/laravel_api/public/model')
             .then(res => res.json())
             .then(
                 (result) => {
-                    console.log(result[0].data);
-                    setmodeldata(result[0].data);
+                    setmodeldata(result.data);
                 }
             )
     }, []);
 
     useEffect(() => {
-        fetch('http://localhost/lcm/api/public/index.php/lcm')
+        fetch('http://localhost/lcm/laravel_api/public/lcm')
             .then(res => res.json())
             .then(
                 (result) => {
-                    setdata(result[0].data);
+                    setinfo(result.data);
                 }
             )
     }, []);
@@ -84,20 +83,20 @@ function FirmwareUpdate() {
         let model_id = document.getElementById('model_select').selectedOptions[0].id;
         console.log(document.getElementById('model_select').selectedOptions[0].id);
         let data = new FormData();
-        data.append("id", JSON.stringify(count));
+        data.append("id", items);
         data.append("model", model_id);
+
         if (items.length !== 0) {
-            fetch('http://localhost/lcm/api/public/index.php/updateModel', {
+            fetch('http://localhost/lcm/laravel_api/public/updateLcmModel', {
                 method: 'POST',
                 body: data
             }).then((res) => {
                 swal("儲存成功!", "Model已更新!", "success").then(() => {
                     window.location.reload(false);
                 })
+            }).catch(e => {
+                console.log(e);
             })
-                .catch(e => {
-                    console.log(e);
-                })
         }
     }
 
@@ -109,7 +108,7 @@ function FirmwareUpdate() {
                     {
                         model_data.map(data => {
                             return (
-                                <option key={data.id} id={data.id}>{data.model}</option>
+                                <option key={data.id} id={data.id}>{data.model_name}</option>
                             )
                         })
                     }
@@ -119,7 +118,7 @@ function FirmwareUpdate() {
             <Row>
                 <Table striped bordered className="col-md-8 col-sm-9 col-8 offset-2">
                     <tbody>
-                        {show_all_LCM(data)}
+                        {show_all_LCM(lcminfo)}
                     </tbody>
                 </Table>
             </Row>
