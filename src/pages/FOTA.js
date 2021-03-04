@@ -9,7 +9,7 @@ function FirmwareUpdate() {
     const [model_data, setmodeldata] = useState([]);
 
     useEffect(() => {
-        fetch('http://localhost/lcm/laravel_api/public/model')
+        fetch('http://localhost/lcm/laravel_api/public/index.php/model')
             .then(res => res.json())
             .then(
                 (result) => {
@@ -19,7 +19,7 @@ function FirmwareUpdate() {
     }, []);
 
     useEffect(() => {
-        fetch('http://localhost/lcm/laravel_api/public/lcm')
+        fetch('http://localhost/lcm/laravel_api/public/index.php/lcm')
             .then(res => res.json())
             .then(
                 (result) => {
@@ -87,7 +87,7 @@ function FirmwareUpdate() {
         data.append("model", model_id);
 
         if (items.length !== 0) {
-            fetch('http://localhost/lcm/laravel_api/public/updateLcmModel', {
+            fetch('http://localhost/lcm/laravel_api/public/index.php/updateLcmModel', {
                 method: 'POST',
                 body: data
             }).then((res) => {

@@ -21,7 +21,7 @@ function LcmStatus() {
     }, []);
 
     const getLCMData = (first) => {
-        fetch('http://localhost/lcm/laravel_api/public/lcm')
+        fetch('http://localhost/lcm/laravel_api/public/index.php/lcm')
             .then(res => res.json())
             .then(
                 (result) => {
@@ -50,7 +50,7 @@ function LcmStatus() {
 
             console.log(color_num + ", " + color[color_num] + ", " + nowIP);
 
-            fetch('http://localhost/lcm/laravel_api/public/getStatus', {
+            fetch('http://localhost/lcm/laravel_api/public/index.php/getStatus', {
                 method: 'POST',
                 body: post_data
             })
