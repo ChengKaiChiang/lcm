@@ -5,12 +5,13 @@ function myNavbar() {
     return (
         <div className="mb-3">
             <Navbar bg="light" expand="lg">
-                <Navbar.Brand href="/"><h2>LCM Aging</h2></Navbar.Brand>
+                <Navbar.Brand href="/">LCM Aging</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="mr-auto">
-                        <Nav.Link href="Lcm_Status"><h3>Status</h3></Nav.Link>
-                        <Nav.Link href="/"><h3>Update</h3></Nav.Link>
+                        <Nav.Link href="Lcm_Status">Status</Nav.Link>
+                        <Nav.Link href="/">Update</Nav.Link>
+                        <Nav.Link href="/Firmware">Firmware</Nav.Link>
                         {/* <NavDropdown title="Dropdown" id="basic-nav-dropdown">
                             <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
                             <NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>
