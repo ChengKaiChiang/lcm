@@ -1,12 +1,14 @@
 import { Table, Row, Button, Form } from 'react-bootstrap';
 import React, { useState, useEffect } from 'react';
 import './css/FOTA.css';
-import swal from 'sweetalert';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 
 function FirmwareUpdate() {
     const [count, setCount] = useState([]);
     const [lcminfo, setinfo] = useState([]);
     const [model_data, setmodeldata] = useState([]);
+    const MySwal = withReactContent(Swal);
 
     useEffect(() => {
         fetch('http://localhost/lcm/laravel_api/public/index.php/model')
@@ -91,7 +93,14 @@ function FirmwareUpdate() {
                 method: 'POST',
                 body: data
             }).then((res) => {
-                swal("儲存成功!", "Model已更新!", "success").then(() => {
+                MySwal.fire({
+                    title: '儲存成功',
+                    icon: 'success',
+                    text: 'Something went wrong!',
+                    showDenyButton: true,
+                    confirmButtonText: "Save",
+                    denyButtonText: `Don't save`
+                  }).then(() => {
                     window.location.reload(false);
                 })
             }).catch(e => {
