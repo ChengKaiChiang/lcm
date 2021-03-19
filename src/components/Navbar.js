@@ -4,7 +4,7 @@ import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
 function myNavbar() {
     return (
         <div className="mb-3">
-            <Navbar bg="light" expand="lg">
+            <Navbar bg="light" expand="md">
                 <Navbar.Brand href="/">LCM Aging</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
@@ -12,6 +12,7 @@ function myNavbar() {
                         <Nav.Link href="Lcm_Status">Status</Nav.Link>
                         <Nav.Link href="/">Update</Nav.Link>
                         <Nav.Link href="/Firmware">Firmware</Nav.Link>
+                        <Nav.Link href="/Model">Model</Nav.Link>
                         {/* <NavDropdown title="Dropdown" id="basic-nav-dropdown">
                             <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
                             <NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>

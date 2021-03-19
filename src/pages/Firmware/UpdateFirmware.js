@@ -1,29 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Row, Button } from 'react-bootstrap';
+import { Row, Button, Form, Col } from 'react-bootstrap';
 import ReactFileReader from 'react-file-reader';
 import md5 from "md5";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDoubleLeft, faSave, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faSave, faUpload } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { useParams } from "react-router-dom";
 import InputSpinner from 'react-bootstrap-input-spinner';
+import Title from '../../components/Title';
 
 function UpdateFirmware() {
     let { id, version } = useParams();
+    const [FontColor, setFont] = useState('');
 
     //old Firmware info
     const [Firmware, setFirmware] = useState('');
     const [OldData, setOldData] = useState([]);
 
     //new Firmware info
+    const [FileName, setFile] = useState('');
     const [FirmwareSize, setSize] = useState('');
     const [FirmwareMD5, setMD5] = useState('');
     const [Firmware_Version, setversion] = useState(version);
     const MySwal = withReactContent(Swal);
 
     const handleFiles = files => {
+        setFont("text-danger");
+        setFile(files[0].name);
         setSize(files[0].size);
         var reader = new FileReader();
         reader.onload = (e) => {
@@ -53,6 +57,7 @@ function UpdateFirmware() {
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
         let data = new URLSearchParams();
+        data.append("File", FileName);
         data.append("Size", FirmwareSize);
         data.append("Version", Firmware_Version);
         data.append("MD5", FirmwareMD5);
@@ -64,7 +69,13 @@ function UpdateFirmware() {
             redirect: 'follow'
         };
 
-        if (OldData.version !== Firmware_Version && OldData.version < Firmware_Version) {
+        if (FileName === "" || FileName === null) {
+            MySwal.fire({
+                title: '請上傳檔案',
+                icon: 'warning',
+            })
+        }
+        else if (OldData.version !== Firmware_Version && OldData.version < Firmware_Version) {
             fetch(`http://localhost/lcm/laravel_api/public/index.php/firmware/${id}`, requestOptions)
                 .then(res => res.json())
                 .then((res) => {
@@ -83,8 +94,8 @@ function UpdateFirmware() {
         } else {
             MySwal.fire({
                 title: '儲存失敗',
-                icon: 'error',
-                text: 'Something went wrong!'
+                icon: 'warning',
+                text: '版本號需要更新!'
             })
         }
     }
@@ -95,49 +106,77 @@ function UpdateFirmware() {
 
     return (
         <div>
-            <div className="col-md-8 offset-2 mb-2">
-                <Row>
-                    <div className="col-md-6">
-                        <h2>Update Firmware</h2>
-                    </div>
-                    <div className="col-md-6 text-right">
-                        <Link to="/Firmware">
-                            <Button variant="info"><FontAwesomeIcon icon={faAngleDoubleLeft} /> Back</Button>{' '}
-                        </Link>
-                    </div>
-                </Row>
-            </div>
-            <div className="col-md-8 offset-2 mb-4">
-                <div className="mb-2">
-                    <ReactFileReader fileTypes={["*"]} handleFiles={handleFiles}>
-                        <Button variant="success"><FontAwesomeIcon icon={faUpload} /> Upload File</Button>
-                    </ReactFileReader>
-                </div>
+            <Title name="Update Firmware" action="Back" link="Firmware" />
 
-                <p>File Name：{Firmware}</p>
-                <p>File Size：{FirmwareSize}</p>
-                <p>MD5：{FirmwareMD5}</p>
-                <Row>
-                    <p className="col-md-1">Version：</p>
-                    <div className="col-md-2">
-                        <InputSpinner
-                            type={'real'}
-                            editable={false}
-                            max={10000}
-                            min={version}
-                            step={1}
-                            value={version}
-                            onChange={num => setVer(num)}
-                            variant={'primary'}
-                            size="sm"
-                        />
-                    </div>
-
-                </Row>
+            <div className="col-md-2 offset-md-2 mb-4">
+                <ReactFileReader fileTypes={["*"]} handleFiles={handleFiles}>
+                    <Button variant="success"><FontAwesomeIcon icon={faUpload} /> Upload File</Button>
+                </ReactFileReader>
             </div>
 
-            <div className="col-md-8 offset-2 text-right">
-                <Button variant="primary" onClick={save}><FontAwesomeIcon icon={faSave} /> Save</Button>
+            <div className="col-md-8 offset-md-2">
+                <Form>
+                    <Form.Group as={Row} controlId="formFirmware">
+                        <Form.Label column sm={2}>
+                            Firmware
+                        </Form.Label>
+                        <Col sm={10}>
+                            <Form.Control type="text" placeholder="Firmware Name" value={Firmware} readOnly />
+                        </Col>
+                    </Form.Group>
+
+                    <Form.Group as={Row} controlId="formFile">
+                        <Form.Label column sm={2}>
+                            File Name
+                        </Form.Label>
+                        <Col sm={10}>
+                            <Form.Control className={FontColor} type="text" placeholder="File Name" value={FileName} readOnly />
+                        </Col>
+                    </Form.Group>
+
+                    <Form.Group as={Row} controlId="formSize">
+                        <Form.Label column sm={2}>
+                            File Size
+                        </Form.Label>
+                        <Col sm={10}>
+                            <Form.Control className={FontColor} type="text" placeholder="File Size" value={FirmwareSize} readOnly />
+                        </Col>
+                    </Form.Group>
+
+                    <Form.Group as={Row} controlId="formMD5">
+                        <Form.Label column sm={2}>
+                            MD5
+                        </Form.Label>
+                        <Col sm={10}>
+                            <Form.Control className={FontColor} type="text" placeholder="MD5" value={FirmwareMD5} readOnly />
+                        </Col>
+                    </Form.Group>
+
+                    <Form.Group as={Row} controlId="formVersion">
+                        <Form.Label column sm={2}>
+                            Version
+                        </Form.Label>
+                        <Col sm={2}>
+                            <InputSpinner
+                                type={'real'}
+                                editable={false}
+                                max={10000}
+                                min={version}
+                                step={1}
+                                value={version}
+                                onChange={num => setVer(num)}
+                                variant={'primary'}
+                                size="sm"
+                            />
+                        </Col>
+                    </Form.Group>
+
+                    <Form.Group as={Row} className="text-right">
+                        <Col sm={{ span: 10, offset: 2 }}>
+                            <Button variant="primary" onClick={save}><FontAwesomeIcon icon={faSave} /> Save</Button>{' '}
+                        </Col>
+                    </Form.Group>
+                </Form>
             </div>
         </div>
     );

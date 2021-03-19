@@ -8,6 +8,9 @@ import Fota from './pages/FOTA';
 import Firmware from './pages/Firmware/Firmware';
 import CreateFirmware from './pages/Firmware/CreateFirmware';
 import UpdateFirmware from './pages/Firmware/UpdateFirmware';
+import Model from './pages/Model/Model';
+import CreateModel from './pages/Model/CreateModel';
+import UpdateModel from './pages/Model/UpdateModel';
 
 class App extends Component {
   render() {
@@ -19,6 +22,9 @@ class App extends Component {
             <Route exact path='/Firmware' component={Firmware} />
             <Route exact path='/CreateFirmware' component={CreateFirmware} />
             <Route exact path='/UpdateFirmware/:id/:version' component={UpdateFirmware} />
+            <Route exact path='/Model' component={Model} />
+            <Route exact path='/CreateModel' component={CreateModel} />
+            <Route exact path='/UpdateModel/:id/:firmware' component={UpdateModel} />
             {/* default route */}
             <Route exact path='/' component={Fota} />
           </main>

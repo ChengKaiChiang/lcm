@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Row, Button } from 'react-bootstrap';
+import { Row, Button, Form, Col } from 'react-bootstrap';
 import ReactFileReader from 'react-file-reader';
 import md5 from "md5";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDoubleLeft, faSave, faTimes, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faSave, faTimes, faUpload } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+import Title from '../../components/Title';
+
 
 function CreateFirmware() {
+    const [validated, setValidated] = useState(false);
     const [FileName, setfilename] = useState('');
     const [FileSize, setfilesize] = useState('');
     const [Firmware_MD5, setMD5] = useState('');
@@ -26,19 +28,33 @@ function CreateFirmware() {
 
     }
 
-    const save = () => {
-        let data = new FormData();
-        data.append("Name", FileName);
-        data.append("Size", FileSize);
-        data.append("Version", '1');
-        data.append("MD5", Firmware_MD5);
+    const handleSubmit = (event) => {
+        console.log(event);
+        const form = event.currentTarget;
+        if (form.checkValidity() === false) {
+            console.log('A');
 
-        if (FileName != '') {
+            event.preventDefault();
+            event.stopPropagation();
+        } else if (FileName !== '' && event.target[0].value !== "") {
+            console.log('B');
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            let data = new FormData();
+            data.append("Name", event.target[0].value);
+            data.append("File", FileName);
+            data.append("Size", FileSize);
+            data.append("Version", '1');
+            data.append("MD5", Firmware_MD5);
+
             fetch('http://localhost/lcm/laravel_api/public/index.php/firmware', {
                 method: 'POST',
                 body: data
             }).then(res => res.json())
                 .then((res) => {
+                    console.log(res);
                     if (res.status === 'OK') {
                         MySwal.fire({
                             title: '儲存成功',
@@ -47,18 +63,29 @@ function CreateFirmware() {
                         }).then(() => {
                             window.history.back();
                         })
+                    } else if (res.DataBase_ErrorCode === 1062) {
+                        MySwal.fire({
+                            title: 'Firmware 重複',
+                            icon: 'warning',
+                            confirmButtonText: "OK",
+                        });
                     }
                 }).catch(e => {
                     console.log(e);
                 })
-        }else {
+        } else {
+            console.log('C');
+
+            event.preventDefault();
+            event.stopPropagation();
             MySwal.fire({
-                title: '儲存失敗',
-                icon: 'error',
-                text: 'Something went wrong!'
+                title: '請上傳檔案',
+                icon: 'warning',
+                confirmButtonText: "OK",
             })
         }
-    }
+        setValidated(true);
+    };
 
     const cancel = () => {
         setfilename('');
@@ -68,33 +95,62 @@ function CreateFirmware() {
 
     return (
         <div>
-            <div className="col-md-8 offset-2 mb-2">
-                <Row>
-                    <div className="col-md-6">
-                        <h2>New Firmware</h2>
-                    </div>
-                    <div className="col-md-6 text-right">
-                        <Link to="/Firmware">
-                            <Button variant="info"><FontAwesomeIcon icon={faAngleDoubleLeft} /> Back</Button>{' '}
-                        </Link>
-                    </div>
-                </Row>
-            </div>
-            <div className="col-md-8 offset-2 mb-2">
-                <div className="mb-2">
-                    <ReactFileReader fileTypes={["*"]} handleFiles={handleFiles}>
-                        <Button variant="success"><FontAwesomeIcon icon={faUpload} /> Upload File</Button>
-                    </ReactFileReader>
-                </div>
+            <Title name="New Firmware" action="Back" link="Firmware" />
 
-                <p>File Name：{FileName}</p>
-                <p>File Size：{FileSize}</p>
-                <p>MD5：{Firmware_MD5}</p>
+            <div className="col-md-2 offset-md-2 mb-4">
+                <ReactFileReader fileTypes={["*"]} handleFiles={handleFiles}>
+                    <Button variant="success"><FontAwesomeIcon icon={faUpload} /> Upload File</Button>
+                </ReactFileReader>
             </div>
 
-            <div className="col-md-8 offset-2 mb-2 text-right">
-                <Button variant="primary" onClick={save}><FontAwesomeIcon icon={faSave} /> Save</Button>{' '}
-                <Button variant="danger" onClick={cancel}><FontAwesomeIcon icon={faTimes} /> Cancel</Button>{' '}
+            <div className="col-md-8 offset-md-2">
+                <Form noValidate validated={validated} onSubmit={handleSubmit}>
+                    <Form.Group as={Row} controlId="formFirmware">
+                        <Form.Label column sm={2}>
+                            Firmware
+                        </Form.Label>
+                        <Col sm={10}>
+                            <Form.Control type="text" placeholder="Firmware Name" required />
+                            <Form.Control.Feedback type="invalid">
+                                Please provide a valid Firmware Name.
+                            </Form.Control.Feedback>
+                        </Col>
+                    </Form.Group>
+
+                    <Form.Group as={Row} controlId="formFile">
+                        <Form.Label column sm={2}>
+                            File Name
+                        </Form.Label>
+                        <Col sm={10}>
+                            <Form.Control type="text" placeholder="File Name" value={FileName} readOnly />
+                        </Col>
+                    </Form.Group>
+
+                    <Form.Group as={Row} controlId="formSize">
+                        <Form.Label column sm={2}>
+                            File Size
+                        </Form.Label>
+                        <Col sm={10}>
+                            <Form.Control type="text" placeholder="File Size" value={FileSize} readOnly />
+                        </Col>
+                    </Form.Group>
+
+                    <Form.Group as={Row} controlId="formMD5">
+                        <Form.Label column sm={2}>
+                            MD5
+                        </Form.Label>
+                        <Col sm={10}>
+                            <Form.Control type="text" placeholder="MD5" value={Firmware_MD5} readOnly />
+                        </Col>
+                    </Form.Group>
+
+                    <Form.Group as={Row} className="text-right">
+                        <Col sm={{ span: 10, offset: 2 }}>
+                            <Button type="submit" variant="primary"><FontAwesomeIcon icon={faSave} /> Save</Button>{' '}
+                            <Button variant="danger" onClick={cancel}><FontAwesomeIcon icon={faTimes} /> Cancel</Button>{' '}
+                        </Col>
+                    </Form.Group>
+                </Form>
             </div>
         </div>
     );
