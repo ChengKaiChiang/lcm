@@ -14,18 +14,21 @@ function CreateFirmware() {
     const [FileName, setfilename] = useState('');
     const [FileSize, setfilesize] = useState('');
     const [Firmware_MD5, setMD5] = useState('');
+    const [File, setFile] = useState(new Uint8Array());
     const MySwal = withReactContent(Swal);
 
     const handleFiles = files => {
         setfilename(files[0].name);
         setfilesize(files[0].size);
-        var reader = new FileReader();
-        reader.onload = (e) => {
-            // Use reader.result
-            setMD5(md5(reader.result));
-        }
-        reader.readAsText(files[0]);
 
+        var reader = new FileReader();
+        reader.onload = () => {
+            let u8_continuous = new Uint8Array(reader.result);
+            console.log(u8_continuous)
+            setFile(u8_continuous);
+            setMD5(md5(u8_continuous));
+        }
+        reader.readAsArrayBuffer(files[0]);
     }
 
     const handleSubmit = (event) => {
@@ -48,8 +51,9 @@ function CreateFirmware() {
             data.append("Size", FileSize);
             data.append("Version", '1');
             data.append("MD5", Firmware_MD5);
+            data.append("data", File);
 
-            fetch('http://localhost/lcm/laravel_api/public/index.php/firmware', {
+            fetch(`${process.env.REACT_APP_API_SERVER}/firmware`, {
                 method: 'POST',
                 body: data
             }).then(res => res.json())

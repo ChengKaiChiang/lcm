@@ -12,7 +12,7 @@ function Firmware() {
     const MySwal = withReactContent(Swal);
 
     useEffect(() => {
-        fetch("http://localhost/lcm/laravel_api/public/index.php/firmware")
+        fetch(`${process.env.REACT_APP_API_SERVER}/firmware`)
             .then(res => res.json())
             .then(
                 (result) => {
@@ -38,7 +38,7 @@ function Firmware() {
                     redirect: 'follow'
                 };
 
-                fetch(`http://localhost/lcm/laravel_api/public/index.php/firmware/${e.target.id}`, requestOptions)
+                fetch(`${process.env.REACT_APP_API_SERVER}/firmware/${e.target.id}`, requestOptions)
                     .then(res => res.json())
                     .then(
                         (result) => {

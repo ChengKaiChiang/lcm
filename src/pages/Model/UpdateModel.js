@@ -18,7 +18,7 @@ function UpdateModel() {
     const MySwal = withReactContent(Swal);
 
     useEffect(() => {
-        fetch(`http://localhost/lcm/laravel_api/public/index.php/model/${id}`)
+        fetch(`${process.env.REACT_APP_API_SERVER}/model/${id}`)
             .then(res => res.json())
             .then(
                 (result) => {
@@ -28,7 +28,7 @@ function UpdateModel() {
     }, [id]);
 
     useEffect(() => {
-        fetch("http://localhost/lcm/laravel_api/public/index.php/firmware")
+        fetch(`${process.env.REACT_APP_API_SERVER}/firmware`)
             .then(res => res.json())
             .then(
                 (result) => {
@@ -54,7 +54,7 @@ function UpdateModel() {
         };
 
         if (firmware !== refSelect.current.value) {
-            fetch(`http://localhost/lcm/laravel_api/public/index.php/model/${id}`, requestOptions)
+            fetch(`${process.env.REACT_APP_API_SERVER}/model/${id}`, requestOptions)
                 .then(res => res.json())
                 .then((res) => {
                     if (res.status === 'OK') {

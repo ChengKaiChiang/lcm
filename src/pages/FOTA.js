@@ -1,4 +1,4 @@
-import { Table, Row, Button, Form } from 'react-bootstrap';
+import { Table, Row, Button, Form, Col } from 'react-bootstrap';
 import React, { useState, useEffect } from 'react';
 import './css/FOTA.css';
 import Swal from 'sweetalert2';
@@ -6,12 +6,12 @@ import withReactContent from 'sweetalert2-react-content';
 
 function FirmwareUpdate() {
     const [count, setCount] = useState([]);
-    const [lcminfo, setinfo] = useState([]);
+    const [Device, setDevice] = useState([]);
     const [model_data, setmodeldata] = useState([]);
     const MySwal = withReactContent(Swal);
 
     useEffect(() => {
-        fetch('http://localhost/lcm/laravel_api/public/index.php/model')
+        fetch(`${process.env.REACT_APP_API_SERVER}/model`)
             .then(res => res.json())
             .then(
                 (result) => {
@@ -21,11 +21,11 @@ function FirmwareUpdate() {
     }, []);
 
     useEffect(() => {
-        fetch('http://localhost/lcm/laravel_api/public/index.php/lcm')
+        fetch(`${process.env.REACT_APP_API_SERVER}/device`)
             .then(res => res.json())
             .then(
                 (result) => {
-                    setinfo(result.data);
+                    setDevice(result.data);
                 }
             )
     }, []);
@@ -33,17 +33,21 @@ function FirmwareUpdate() {
     //改值的時候
     const onChangeorder = (e) => {
         const items = [...count];
-        if (e.target.checked === true)
-            items.push(e.target.id);
+        if (e.target.checked === true) {
+            let device = e.target.id.split('_')[0];
+            let position = e.target.id.split('_')[1];
+            let arr_data = { 'device': device, 'position': position }
+            items.push(arr_data);
+        }
         else {
             items.forEach(function (item, index, arr) {
-                if (item === e.target.id) {
+                let device = e.target.id.split('_')[0];
+                let position = e.target.id.split('_')[1];
+                if (item.device === device && item.position === position) {
                     arr.splice(index, 1);
                 }
             });
         }
-
-        console.log(items);
         setCount(items);
     }
 
@@ -52,8 +56,12 @@ function FirmwareUpdate() {
         for (let x of data) {
             lists.push(
                 <td>
-                    <label> No.{x.id}</label>
-                    <input type="checkbox" className="checkbox offset-1" id={x.id} onChange={(e) => onChangeorder(e)} />
+                    <Row>
+                        <Col>
+                            <span className="h3">Device.{x.device} </span>
+                            <input type="checkbox" className="checkbox" id={x.device + '_' + x.position} onChange={(e) => onChangeorder(e)} />
+                        </Col>
+                    </Row>
                 </td>
             )
         }
@@ -80,28 +88,27 @@ function FirmwareUpdate() {
     }
 
     function Firmware_update() {
-        const items = [...count];
-        console.log(items.length);
-        let model_id = document.getElementById('model_select').selectedOptions[0].id;
-        console.log(document.getElementById('model_select').selectedOptions[0].id);
-        let data = new FormData();
-        data.append("id", items);
-        data.append("model", model_id);
+        const items = count;
+        console.log(items);
+        let index = document.getElementById('model_select').selectedOptions[0].id;
+
+
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        var raw = JSON.stringify({ "id": items, "file": model_data[index].firmware.file, "MD5": model_data[index].firmware.MD5 });
 
         if (items.length !== 0) {
-            fetch('http://localhost/lcm/laravel_api/public/index.php/updateLcmModel', {
+            fetch(`${process.env.REACT_APP_API_SERVER}/FOTA`, {
                 method: 'POST',
-                body: data
+                headers: myHeaders,
+                body: raw
             }).then((res) => {
                 MySwal.fire({
-                    title: '儲存成功',
+                    title: '開始更新',
                     icon: 'success',
-                    text: 'Something went wrong!',
-                    showDenyButton: true,
-                    confirmButtonText: "Save",
-                    denyButtonText: `Don't save`
-                  }).then(() => {
-                    window.location.reload(false);
+                    confirmButtonText: "OK",
+                }).then(() => {
+                    window.location.href = '/Device';
                 })
             }).catch(e => {
                 console.log(e);
@@ -112,12 +119,12 @@ function FirmwareUpdate() {
     return (
         <div>
             <Row>
-                <Button variant="primary" className="offset-2 mb-3" onClick={Firmware_update}>Firmware Upload</Button>{' '}
+                <Button variant="primary" className="offset-2 mb-3" onClick={Firmware_update}>Firmware Update</Button>{' '}
                 <Form.Control as="select" className="col-md-1 col-sm-1 ml-3" id="model_select">
                     {
-                        model_data.map(data => {
+                        model_data.map((data, index) => {
                             return (
-                                <option key={data.id} id={data.id}>{data.model_name}</option>
+                                <option key={data.id} id={index}>{data.model}</option>
                             )
                         })
                     }
@@ -127,7 +134,7 @@ function FirmwareUpdate() {
             <Row>
                 <Table striped bordered className="col-md-8 col-sm-9 col-8 offset-2">
                     <tbody>
-                        {show_all_LCM(lcminfo)}
+                        {show_all_LCM(Device)}
                     </tbody>
                 </Table>
             </Row>

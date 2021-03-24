@@ -14,7 +14,7 @@ function CreateModel() {
     const refSelect = useRef(null);
 
     useEffect(() => {
-        fetch("http://localhost/lcm/laravel_api/public/index.php/firmware")
+        fetch(`${process.env.REACT_APP_API_SERVER}/firmware`)
             .then(res => res.json())
             .then(
                 (result) => {
@@ -44,7 +44,7 @@ function CreateModel() {
             data.append("Model", event.target[0].value);
             data.append("Firmware", refSelect.current.value);
 
-            fetch('http://localhost/lcm/laravel_api/public/index.php/model', {
+            fetch(`${process.env.REACT_APP_API_SERVER}/model`, {
                 method: 'POST',
                 body: data
             }).then(res => res.json())

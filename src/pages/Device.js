@@ -1,25 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Row, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-import Title from '../../components/Title';
+import Title from '../components/Title';
 
-function Model() {
+function Device() {
     const [ModelData, setModelData] = useState([]);
     const MySwal = withReactContent(Swal);
 
     useEffect(() => {
-        fetch(`${process.env.REACT_APP_API_SERVER}/model`)
+        fetch(`${process.env.REACT_APP_API_SERVER}/device`)
             .then(res => res.json())
             .then(
                 (result) => {
-                    console.log(result.data);
                     setModelData(result.data);
                 }
             )
+        const timer = setInterval(() => {
+            fetch(`${process.env.REACT_APP_API_SERVER}/device`)
+                .then(res => res.json())
+                .then(
+                    (result) => {
+                        setModelData(result.data);
+                    }
+                )
+        }, 3000)
+        return () => clearInterval(timer);
     }, []);
 
     const data_Delete = (e, model) => {
@@ -58,9 +66,22 @@ function Model() {
         })
     };
 
+    const test = (a) => {
+
+        let color = 'success';
+        if (a === '0') {
+            color = 'success';
+        } else if (a === '1') {
+            color = 'warning';
+        } else if (a === '2') {
+            color = 'danger';
+        }
+
+        return (<Button variant={color} className='btn-circle'></Button>)
+    }
     return (
         <div>
-            <Title name="Models" action="Create" link="CreateModel" />
+            <Title name="Devices" action="no" />
 
             <Row>
                 <div className="col-md-8 offset-2">
@@ -68,10 +89,12 @@ function Model() {
                         <thead>
                             <tr className="text-center">
                                 <th>#</th>
+                                <th>Position</th>
+                                <th>Device</th>
                                 <th>Model</th>
                                 <th>Firmware</th>
                                 <th>Version</th>
-                                <th>Update</th>
+                                <th>Status</th>
                                 <th>Delete</th>
                             </tr>
                         </thead>
@@ -80,15 +103,15 @@ function Model() {
                                 return (
                                     <tr key={data.id}>
                                         <th scope="row">{index + 1}</th>
+                                        <td>{data.position}</td>
+                                        <td>{data.device}</td>
                                         <td>{data.model}</td>
-                                        <td>{data.firmware.firmware}</td>
-                                        <td>V{data.firmware.version}</td>
+                                        <td>{data.firmware}</td>
+                                        <td>V{data.version}</td>
                                         <td>
-                                            <Link to={`/UpdateModel/${data.id}/${data.firmware.id}`}>
-                                                <Button variant="warning"><FontAwesomeIcon icon={faEdit} /></Button>
-                                            </Link>
+                                            {test(data.status)}
                                         </td>
-                                        <td><Button variant="danger" id={data.id} onClick={(e) => data_Delete(e, data.model)}><FontAwesomeIcon icon={faTrashAlt} /></Button></td>
+                                        <td><Button variant="danger" id={data.id} onClick={(e) => data_Delete(e, data.device)}><FontAwesomeIcon icon={faTrashAlt} /></Button></td>
                                     </tr>
                                 )
                             })}
@@ -100,4 +123,4 @@ function Model() {
     );
 }
 
-export default Model;
+export default Device;

@@ -11,15 +11,12 @@ function myNavbar() {
                     <Nav className="mr-auto">
                         <Nav.Link href="Lcm_Status">Status</Nav.Link>
                         <Nav.Link href="/">Update</Nav.Link>
-                        <Nav.Link href="/Firmware">Firmware</Nav.Link>
-                        <Nav.Link href="/Model">Model</Nav.Link>
-                        {/* <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-                            <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-                            <NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>
-                            <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
+                        <Nav.Link href="/Device">Device</Nav.Link>
+                        <NavDropdown title="Setting" id="basic-nav-dropdown">
+                            <NavDropdown.Item href="/Firmware">Firmware</NavDropdown.Item>
                             <NavDropdown.Divider />
-                            <NavDropdown.Item href="#action/3.4">Separated link</NavDropdown.Item>
-                        </NavDropdown> */}
+                            <NavDropdown.Item href="/Model">Model</NavDropdown.Item>
+                        </NavDropdown>
                     </Nav>
                 </Navbar.Collapse>
             </Navbar>

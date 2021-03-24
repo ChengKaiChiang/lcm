@@ -29,6 +29,10 @@ function SelectButton(props) {
         return (
             <Button variant="info"><FontAwesomeIcon icon={faAngleDoubleLeft} /> {props.action}</Button>
         );
+    } else if (props.action === 'no') {
+        return (
+            <Button hidden></Button>
+        );
     }
 
 }

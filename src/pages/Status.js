@@ -3,32 +3,26 @@ import React, { useState, useEffect } from 'react';
 import parse from 'html-react-parser';
 import ReactPlayer from 'react-player';
 function LcmStatus() {
-    const [color] = useState(["WHITE", "WHITE", "BLACK", "RED", "GREEN", "BLUE"]);
+    const [color] = useState(["White", "White", "Black", "Red", "Green", "Blue", 'V127']);
     const [color_num, setnum] = useState(0);
-    const [quantity, setquantity] = useState(0);
-    const [nowIP, setip] = useState("");
-    const [lcminfo, setinfo] = useState([]);
+    const [LCMDevice, setLCMDevice] = useState([]);
     const [showData, setshowData] = useState("");
+    const [SelectIndex, setSelectIndex] = useState(0);
 
     useEffect(() => {
-        let first = true;
-        getLCMData(first);
+        getLCMData();
         const timer = setInterval(() => {
-            first = false;
-            getLCMData(first);
+            getLCMData();
         }, 5000)
         return () => clearInterval(timer);
     }, []);
 
-    const getLCMData = (first) => {
-        fetch('http://localhost/lcm/laravel_api/public/index.php/lcm')
+    const getLCMData = () => {
+        fetch(`${process.env.REACT_APP_API_SERVER}/device`)
             .then(res => res.json())
             .then(
                 (result) => {
-                    setquantity(result.data.length);
-                    if (first)
-                        setip(result.data[0].ip);
-                    setinfo(result.data);
+                    setLCMDevice(result.data);
                 }
             )
     }
@@ -41,24 +35,26 @@ function LcmStatus() {
         const timer = setInterval(() => {
             let post_data = new FormData();
             post_data.append("color", color[color_num]);
-            post_data.append("device_ip", nowIP);
+            post_data.append("device", LCMDevice[SelectIndex].device);
+            post_data.append("position", LCMDevice[SelectIndex].position);
+
             let num = color_num;
-            if (num === 5)
+            if (num === 6)
                 setnum(0);
             else
                 setnum(++num);
 
-            console.log(color_num + ", " + color[color_num] + ", " + nowIP);
+            console.log(color_num + ", " + color[color_num] + ", " + LCMDevice[SelectIndex].device + ", " + LCMDevice[SelectIndex].device);
 
-            fetch('http://localhost/lcm/laravel_api/public/index.php/getStatus', {
+            fetch(`${process.env.REACT_APP_API_SERVER}/getStatus`, {
                 method: 'POST',
                 body: post_data
             })
                 .then(res => res.json())
                 .then(
                     (result) => {
-                        let show_str = "Color:" + color[color_num] + "<br/> LCM Power:" + result[0].lcm_power + "V <br/> LCM Current:" + result[0].lcm_current + "mA <br/>" +
-                            " Back Light Power:" + result[0].backlight_power + "V <br/> Back Light Current:" + result[0].backlight_current + "mA";
+                        let show_str = "Color: " + color[color_num] + "<br/> LCM Power: " + result[0].lcm_power + "V <br/> LCM Current: " + result[0].lcm_current + "mA <br/>" +
+                            " Back Light Power: " + result[0].backlight_power + "V <br/> Back Light Current: " + result[0].backlight_current + "mA";
 
                         setshowData(show_str);
                     }
@@ -68,37 +64,36 @@ function LcmStatus() {
     });
 
     const changNowID = (e) => {
-        setip(e.target.id);
+        setSelectIndex(e.target.id);
     }
 
-    const data_process = (data) => {
+    const data_process = (datas) => {
         var lists = [];
-        for (let x of data) {
-            if (x.lcmmodel === null) {
-                lists.push(
-                    <td>
-                        <Row>
-                            <Col>
-                                <span className="h1">No.{x.id}</span>
-                                <button type="button" className="offset-1 btn btn-success btn-circle btn-xl" id={x.ip} onClick={(e) => changNowID(e)}></button>
-                                <span className="h1 offset-1">null</span>
-                            </Col>
-                        </Row>
-                    </td>
-                )
-            } else {
-                lists.push(
-                    <td>
-                        <Row>
-                            <Col>
-                                <span className="h1">No.{x.id}</span>
-                                <button type="button" className="offset-1 btn btn-success btn-circle btn-xl" id={x.ip} onClick={(e) => changNowID(e)}></button>
-                                <span className="h1 offset-1">{x.lcmmodel.model_name}</span>
-                            </Col>
-                        </Row>
-                    </td>
-                )
-            }
+        datas.map((data, index) => {
+            lists.push(
+                <td>
+                    <Row>
+                        <Col >
+                            <span className="h2">No.{index + 1}</span>
+                            <button type="button" className="offset-1 btn btn-success btn-circle" id={index} onClick={(e) => changNowID(e)}></button>
+                            <span className="h2 offset-1">{data.model}</span>
+                        </Col>
+                    </Row>
+                </td>
+            )
+            return 0;
+        })
+
+        if (datas.length % 2 !== 0) {
+            lists.push(
+                <td>
+                    <Row>
+                        <Col>
+                            <span className="h1 offset-1">null</span>
+                        </Col>
+                    </Row>
+                </td>
+            )
         }
         return (lists)
     }
@@ -120,22 +115,33 @@ function LcmStatus() {
         return (show_lists)
     }
 
+    const test = () => {
+        if (LCMDevice.length !== 0) {
+            return (
+                <div>
+                    Device: {LCMDevice[SelectIndex].device} <br />
+                    Position: {LCMDevice[SelectIndex].position}
+                </div>
+            );
+        }
+    }
+
     return (
         <Row>
-            <div className="col-md-7">
+            <div className="offset-1 col-md-6">
                 <Table striped bordered >
                     <tbody>
-                        {show_all_LCM(lcminfo)}
+                        {show_all_LCM(LCMDevice)}
                     </tbody>
                 </Table>
             </div>
             <div className="col-md-4">
                 <Card className="mb-3 col-md-8">
                     <Card.Body>
-                        <Card.Title>目前運作數量: {quantity}</Card.Title>
-                        <Card.Text>
-                            Device IP: {nowIP}
-                        </Card.Text>
+                        <Card.Title>目前運作數量: {LCMDevice.length}</Card.Title>
+                        <Card.Subtitle>
+                            {test()}
+                        </Card.Subtitle>
                     </Card.Body>
                     <ListGroup className="list-group-flush">
                         <ListGroupItem>{show_all_details()}</ListGroupItem>

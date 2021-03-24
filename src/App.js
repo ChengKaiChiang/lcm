@@ -11,6 +11,7 @@ import UpdateFirmware from './pages/Firmware/UpdateFirmware';
 import Model from './pages/Model/Model';
 import CreateModel from './pages/Model/CreateModel';
 import UpdateModel from './pages/Model/UpdateModel';
+import Device from './pages/Device';
 
 class App extends Component {
   render() {
@@ -25,6 +26,7 @@ class App extends Component {
             <Route exact path='/Model' component={Model} />
             <Route exact path='/CreateModel' component={CreateModel} />
             <Route exact path='/UpdateModel/:id/:firmware' component={UpdateModel} />
+            <Route exact path='/Device' component={Device} />
             {/* default route */}
             <Route exact path='/' component={Fota} />
           </main>

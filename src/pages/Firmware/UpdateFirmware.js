@@ -19,27 +19,31 @@ function UpdateFirmware() {
     const [OldData, setOldData] = useState([]);
 
     //new Firmware info
-    const [FileName, setFile] = useState('');
+    const [FileName, setFileName] = useState('');
     const [FirmwareSize, setSize] = useState('');
     const [FirmwareMD5, setMD5] = useState('');
     const [Firmware_Version, setversion] = useState(version);
+    
+    const [File, setFile] = useState(new Uint8Array());
+
     const MySwal = withReactContent(Swal);
 
     const handleFiles = files => {
         setFont("text-danger");
-        setFile(files[0].name);
+        setFileName(files[0].name);
         setSize(files[0].size);
         var reader = new FileReader();
-        reader.onload = (e) => {
-            // Use reader.result
-            setMD5(md5(reader.result));
+        reader.onload = () => {
+            let u8_continuous = new Uint8Array(reader.result);
+            setFile(u8_continuous);
+            setMD5(md5(u8_continuous));
         }
-        reader.readAsText(files[0]);
+        reader.readAsArrayBuffer(files[0]);
 
     }
 
     useEffect(() => {
-        fetch(`http://localhost/lcm/laravel_api/public/index.php/firmware/${id}`)
+        fetch(`${process.env.REACT_APP_API_SERVER}/firmware/${id}`)
             .then(res => res.json())
             .then(
                 (result) => {
@@ -61,6 +65,7 @@ function UpdateFirmware() {
         data.append("Size", FirmwareSize);
         data.append("Version", Firmware_Version);
         data.append("MD5", FirmwareMD5);
+        data.append("data", File);
 
         var requestOptions = {
             method: 'PUT',
@@ -76,7 +81,7 @@ function UpdateFirmware() {
             })
         }
         else if (OldData.version !== Firmware_Version && OldData.version < Firmware_Version) {
-            fetch(`http://localhost/lcm/laravel_api/public/index.php/firmware/${id}`, requestOptions)
+            fetch(`${process.env.REACT_APP_API_SERVER}/firmware/${id}`, requestOptions)
                 .then(res => res.json())
                 .then((res) => {
                     if (res.status === 'OK') {
