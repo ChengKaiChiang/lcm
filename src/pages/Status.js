@@ -1,50 +1,49 @@
-import { Table, Col, Row, Card, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Table, Col, Row, Card, Button } from 'react-bootstrap';
 import React, { useState, useEffect } from 'react';
-import parse from 'html-react-parser';
-import ReactPlayer from 'react-player';
+
 function LcmStatus() {
-    const [color] = useState(["White", "White", "Black", "Red", "Green", "Blue", 'V127']);
-    const [color_num, setnum] = useState(0);
     const [LCMDevice, setLCMDevice] = useState([]);
-    const [showData, setshowData] = useState("");
+    const [showData, setshowData] = useState([]);
     const [SelectIndex, setSelectIndex] = useState(0);
+    const [NowTime, setNowTime] = useState('');
 
     useEffect(() => {
-        getLCMData();
+        getDevices();
         const timer = setInterval(() => {
-            getLCMData();
+            getDevices();
         }, 5000)
         return () => clearInterval(timer);
     }, []);
 
-    const getLCMData = () => {
+    const getDevices = () => {
         fetch(`${process.env.REACT_APP_API_SERVER}/device`)
             .then(res => res.json())
             .then(
                 (result) => {
                     setLCMDevice(result.data);
+                    setNowTime(result.now_time);
                 }
             )
     }
 
-    const show_all_details = () => {
-        return parse(showData);
+    const show_all_details = (color) => {
+        if (showData.length > 0) {
+            return (
+                <Card.Text>
+                    LCM Power: {showData[0].[color].lcm_power} V<br />
+                    LCM Current: {showData[0].[color].lcm_current} mA <br />
+                    Back Light Power: {showData[0].[color].backlight_power} V<br />
+                    Back Light Current: {showData[0].[color].backlight_current} mA
+                </Card.Text>
+            )
+        }
     }
 
     useEffect(() => {
         const timer = setInterval(() => {
             let post_data = new FormData();
-            post_data.append("color", color[color_num]);
             post_data.append("device", LCMDevice[SelectIndex].device);
             post_data.append("position", LCMDevice[SelectIndex].position);
-
-            let num = color_num;
-            if (num === 6)
-                setnum(0);
-            else
-                setnum(++num);
-
-            console.log(color_num + ", " + color[color_num] + ", " + LCMDevice[SelectIndex].device + ", " + LCMDevice[SelectIndex].device);
 
             fetch(`${process.env.REACT_APP_API_SERVER}/getStatus`, {
                 method: 'POST',
@@ -53,10 +52,7 @@ function LcmStatus() {
                 .then(res => res.json())
                 .then(
                     (result) => {
-                        let show_str = "Color: " + color[color_num] + "<br/> LCM Power: " + result[0].lcm_power + "V <br/> LCM Current: " + result[0].lcm_current + "mA <br/>" +
-                            " Back Light Power: " + result[0].backlight_power + "V <br/> Back Light Current: " + result[0].backlight_current + "mA";
-
-                        setshowData(show_str);
+                        setshowData(result);
                     }
                 )
         }, 2000);
@@ -69,13 +65,32 @@ function LcmStatus() {
 
     const data_process = (datas) => {
         var lists = [];
+
         datas.map((data, index) => {
+            let update_at = Date.parse(datas[0].updated_at);
+            let now = Date.parse(NowTime);
+            let Variant = 'secondary';
+
+            if (data.lcm_status === '1' && (now - update_at) < 5 * 60 * 1000) {
+                Variant = 'success';
+            } else if (data.lcm_status === '2') {
+                Variant = 'danger';
+            } else if (data.lcm_status === '0') {
+                Variant = 'secondary';
+            }
+            else if ((now - update_at) > 5 * 60 * 1000) {
+                console.log('a');
+                Variant = 'secondary';
+                set_deive_offline(data.id);
+            }
+
             lists.push(
                 <td>
                     <Row>
                         <Col >
                             <span className="h2">No.{index + 1}</span>
-                            <button type="button" className="offset-1 btn btn-success btn-circle" id={index} onClick={(e) => changNowID(e)}></button>
+                            <Button className="offset-1 btn-circle" variant={Variant} id={index} onClick={(e) => changNowID(e)}></Button>
+                            {/* <button type="button" className="offset-1 btn btn-success btn-circle" id={index} onClick={(e) => changNowID(e)}></button> */}
                             <span className="h2 offset-1">{data.model}</span>
                         </Col>
                     </Row>
@@ -98,6 +113,28 @@ function LcmStatus() {
         return (lists)
     }
 
+    const set_deive_offline = (id) => {
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+        var requestOptions = {
+            method: 'PUT',
+            headers: myHeaders,
+            redirect: 'follow'
+        };
+
+        fetch(`${process.env.REACT_APP_API_SERVER}/setDeviceOffline/${id}`, requestOptions)
+            .then(res => res.json())
+            .then((res) => {
+                if (res.status === 'OK') {
+                    console.log('OK')
+                }
+            }).catch(e => {
+                console.log(e);
+            })
+
+    }
+
     const show_all_LCM = (data) => {
         let dataProcess = data_process(data);
 
@@ -115,7 +152,7 @@ function LcmStatus() {
         return (show_lists)
     }
 
-    const test = () => {
+    const getDevice = () => {
         if (LCMDevice.length !== 0) {
             return (
                 <div>
@@ -135,20 +172,45 @@ function LcmStatus() {
                     </tbody>
                 </Table>
             </div>
-            <div className="col-md-4">
-                <Card className="mb-3 col-md-8">
+            <div>
+                <Card style={{ width: '18rem' }}>
                     <Card.Body>
                         <Card.Title>目前運作數量: {LCMDevice.length}</Card.Title>
                         <Card.Subtitle>
-                            {test()}
+                            {getDevice()}
                         </Card.Subtitle>
                     </Card.Body>
-                    <ListGroup className="list-group-flush">
-                        <ListGroupItem>{show_all_details()}</ListGroupItem>
-                    </ListGroup>
                 </Card>
-
-                <ReactPlayer url='https://www.youtube.com/watch?v=HjNkFHItWQk' />
+                <Card bg='light' text='dark' style={{ width: '18rem' }} >
+                    <Card.Body>
+                        {show_all_details('light')}
+                    </Card.Body>
+                </Card>
+                <Card bg='dark' text='white' style={{ width: '18rem' }} >
+                    <Card.Body>
+                        {show_all_details('dark')}
+                    </Card.Body>
+                </Card>
+                <Card bg='danger' text='white' style={{ width: '18rem' }} >
+                    <Card.Body>
+                        {show_all_details('danger')}
+                    </Card.Body>
+                </Card>
+                <Card bg='success' text='white' style={{ width: '18rem' }} >
+                    <Card.Body>
+                        {show_all_details('success')}
+                    </Card.Body>
+                </Card>
+                <Card bg='primary' text='white' style={{ width: '18rem' }} >
+                    <Card.Body>
+                        {show_all_details('primary')}
+                    </Card.Body>
+                </Card>
+                <Card bg='secondary' text='white' style={{ width: '18rem' }} >
+                    <Card.Body>
+                        {show_all_details('secondary')}
+                    </Card.Body>
+                </Card>
             </div>
         </Row>
     );

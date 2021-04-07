@@ -30,11 +30,11 @@ function Device() {
         return () => clearInterval(timer);
     }, []);
 
-    const data_Delete = (e, model) => {
+    const data_Delete = (e, device, position) => {
         MySwal.fire({
             title: 'Are you sure?',
             icon: 'warning',
-            text: '是否要刪除 ' + model + ' ?',
+            text: '是否要刪除 ' + device + '_' + position + ' ?',
             showDenyButton: true,
             confirmButtonText: "OK",
             denyButtonText: "Cancel"
@@ -46,7 +46,7 @@ function Device() {
                     redirect: 'follow'
                 };
 
-                fetch(`${process.env.REACT_APP_API_SERVER}/model/${e.target.id}`, requestOptions)
+                fetch(`${process.env.REACT_APP_API_SERVER}/device/${e.target.id}`, requestOptions)
                     .then(res => res.json())
                     .then(
                         (result) => {
@@ -66,14 +66,17 @@ function Device() {
         })
     };
 
-    const test = (a) => {
+    const test = (Device_status) => {
 
-        let color = 'success';
-        if (a === '0') {
+        let color = 'secondary';
+        if (Device_status === '-1') {
+            color = 'secondary';
+        }
+        else if (Device_status === '0') {
             color = 'success';
-        } else if (a === '1') {
+        } else if (Device_status === '1') {
             color = 'warning';
-        } else if (a === '2') {
+        } else if (Device_status === '2') {
             color = 'danger';
         }
 
@@ -111,7 +114,7 @@ function Device() {
                                         <td>
                                             {test(data.status)}
                                         </td>
-                                        <td><Button variant="danger" id={data.id} onClick={(e) => data_Delete(e, data.device)}><FontAwesomeIcon icon={faTrashAlt} /></Button></td>
+                                        <td><Button variant="danger" id={data.id} onClick={(e) => data_Delete(e, data.device, data.position)}><FontAwesomeIcon icon={faTrashAlt} /></Button></td>
                                     </tr>
                                 )
                             })}
