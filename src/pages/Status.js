@@ -67,7 +67,7 @@ function LcmStatus() {
         var lists = [];
 
         datas.map((data, index) => {
-            let update_at = Date.parse(datas[0].updated_at);
+            let update_at = Date.parse(data.updated_at);
             let now = Date.parse(NowTime);
             let Variant = 'secondary';
 
