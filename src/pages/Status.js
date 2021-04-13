@@ -46,43 +46,48 @@ function LcmStatus() {
     }
 
     useEffect(() => {
+        getDetailData(Device, Position);
         const timer = setInterval(() => {
-            let post_data = new FormData();
-            post_data.append("device", Device);
-            post_data.append("position", Position);
-
-            fetch(`${process.env.REACT_APP_API_SERVER}/getStatus`, {
-                method: 'POST',
-                body: post_data
-            })
-                .then(res => res.json())
-                .then(
-                    (result) => {
-                        setshowData(result);
-                    }
-                )
+            getDetailData(Device, Position);
         }, 2000);
 
         return () => clearInterval(timer);
     }, [Device, Position]);
 
+    const getDetailData = (device ,position) => {
+        let post_data = new FormData();
+        post_data.append("device", device);
+        post_data.append("position", position);
+
+        fetch(`${process.env.REACT_APP_API_SERVER}/getStatus`, {
+            method: 'POST',
+            body: post_data
+        })
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    if (result[0].length !== 0)
+                        setshowData(result);
+                }
+            )
+    }
+
     const changNowID = (e) => {
         setSelectIndex(e.target.id);
-        setDevice(LCMDevice[SelectIndex].device);
-        setPosition(LCMDevice[SelectIndex].position);
+        setDevice(LCMDevice[e.target.id].device);
+        setPosition(LCMDevice[e.target.id].position);
     }
 
     const data_process = (datas) => {
         var lists = [];
-        
+
         datas.map((data, index) => {
             lists.push(
                 <td>
                     <Row>
                         <Col >
-                            <span className="h2">No.{index + 1}</span>
+                            <span className="h2">Device.{data.device}</span>
                             <Button className="offset-1 btn-circle" variant={data.variant} id={index} onClick={(e) => changNowID(e)}></Button>
-                            {/* <button type="button" className="offset-1 btn btn-success btn-circle" id={index} onClick={(e) => changNowID(e)}></button> */}
                             <span className="h2 offset-1">{data.model}</span>
                         </Col>
                     </Row>

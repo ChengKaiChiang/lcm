@@ -9,8 +9,8 @@ function myNavbar() {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="mr-auto">
-                        <Nav.Link href="Lcm_Status">Status</Nav.Link>
-                        <Nav.Link href="/">Update</Nav.Link>
+                        <Nav.Link href="/">Status</Nav.Link>
+                        <Nav.Link href="/Update">Update</Nav.Link>
                         <Nav.Link href="/Device">Device</Nav.Link>
                         <NavDropdown title="Setting" id="basic-nav-dropdown">
                             <NavDropdown.Item href="/Firmware">Firmware</NavDropdown.Item>

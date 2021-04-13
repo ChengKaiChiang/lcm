@@ -19,7 +19,7 @@ class App extends Component {
       <div id="wrapper">
         <MyNavbar />
         <main role="main">
-            <Route exact path='/Lcm_Status' component={LcmStatus} />
+            <Route exact path='/Update' component={Fota} />
             <Route exact path='/Firmware' component={Firmware} />
             <Route exact path='/CreateFirmware' component={CreateFirmware} />
             <Route exact path='/UpdateFirmware/:id/:version' component={UpdateFirmware} />
@@ -28,7 +28,7 @@ class App extends Component {
             <Route exact path='/UpdateModel/:id/:firmware' component={UpdateModel} />
             <Route exact path='/Device' component={Device} />
             {/* default route */}
-            <Route exact path='/' component={Fota} />
+            <Route exact path='/' component={LcmStatus} />
           </main>
       </div>
     );
