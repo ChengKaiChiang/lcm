@@ -54,7 +54,7 @@ function LcmStatus() {
         return () => clearInterval(timer);
     }, [Device, Position]);
 
-    const getDetailData = (device ,position) => {
+    const getDetailData = (device, position) => {
         let post_data = new FormData();
         post_data.append("device", device);
         post_data.append("position", position);
@@ -152,7 +152,8 @@ function LcmStatus() {
             <div>
                 <Card style={{ width: '18rem' }}>
                     <Card.Body>
-                        <Card.Title>目前運作數量: {OnlineNum}</Card.Title>
+                        <Card.Title>
+                            <h2>Aging Mode</h2>目前運作數量: {OnlineNum}</Card.Title>
                         <Card.Subtitle>
                             {getDevice()}
                         </Card.Subtitle>
@@ -181,11 +182,6 @@ function LcmStatus() {
                 <Card bg='primary' text='white' style={{ width: '18rem' }} >
                     <Card.Body>
                         {show_all_details('primary')}
-                    </Card.Body>
-                </Card>
-                <Card bg='secondary' text='white' style={{ width: '18rem' }} >
-                    <Card.Body>
-                        {show_all_details('secondary')}
                     </Card.Body>
                 </Card>
             </div>
