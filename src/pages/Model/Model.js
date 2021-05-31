@@ -11,7 +11,7 @@ function Model() {
     const [ModelData, setModelData] = useState([]);
     const MySwal = withReactContent(Swal);
 
-    useEffect(() => {
+    const getModel = () => {
         fetch(`${process.env.REACT_APP_API_SERVER}/model`)
             .then(res => res.json())
             .then(
@@ -20,42 +20,48 @@ function Model() {
                     setModelData(result.data);
                 }
             )
+    }
+    useEffect(() => {
+        getModel()
     }, []);
 
-    const data_Delete = (e, model) => {
-        MySwal.fire({
-            title: 'Are you sure?',
-            icon: 'warning',
-            text: '是否要刪除 ' + model + ' ?',
-            showDenyButton: true,
-            confirmButtonText: "OK",
-            denyButtonText: "Cancel"
-        }).then((result) => {
-            console.log(result);
-            if (result.value) {
-                let requestOptions = {
-                    method: 'DELETE',
-                    redirect: 'follow'
-                };
-
-                fetch(`${process.env.REACT_APP_API_SERVER}/model/${e.target.id}`, requestOptions)
-                    .then(res => res.json())
-                    .then(
-                        (result) => {
-                            console.log(result.data);
-                            if (result.status === 'OK') {
-                                MySwal.fire({
-                                    title: '刪除成功',
-                                    icon: 'success',
-                                    confirmButtonText: "OK",
-                                }).then(() => {
-                                    window.location.reload(false);
-                                })
+    const data_Delete = (e, id, model) => {
+        console.log(id);
+        if (id !== '') {
+            MySwal.fire({
+                title: 'Are you sure?',
+                icon: 'warning',
+                text: '是否要刪除 ' + model + ' ?',
+                showDenyButton: true,
+                confirmButtonText: "OK",
+                denyButtonText: "Cancel"
+            }).then((result) => {
+                console.log(result);
+                if (result.value) {
+                    let requestOptions = {
+                        method: 'DELETE',
+                        redirect: 'follow'
+                    };
+                    fetch(`${process.env.REACT_APP_API_SERVER}/model/${id}`, requestOptions)
+                        .then(res => res.json())
+                        .then(
+                            (result) => {
+                                console.log(result.data);
+                                if (result.status === 'OK') {
+                                    MySwal.fire({
+                                        title: '刪除成功',
+                                        icon: 'success',
+                                        confirmButtonText: "OK",
+                                    }).then(
+                                        getModel()
+                                    )
+                                }
                             }
-                        }
-                    )
-            }
-        })
+                        )
+                }
+            })
+        }
+
     };
 
     return (
@@ -88,7 +94,11 @@ function Model() {
                                                 <Button variant="warning"><FontAwesomeIcon icon={faEdit} /></Button>
                                             </Link>
                                         </td>
-                                        <td><Button variant="danger" id={data.id} onClick={(e) => data_Delete(e, data.model)}><FontAwesomeIcon icon={faTrashAlt} /></Button></td>
+                                        <td>
+                                            <Button variant="danger" id={data.id} onClick={(e) => data_Delete(e, data.id, data.model)}>
+                                                <FontAwesomeIcon icon={faTrashAlt} />
+                                            </Button>
+                                        </td>
                                     </tr>
                                 )
                             })}

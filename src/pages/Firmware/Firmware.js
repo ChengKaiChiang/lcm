@@ -11,7 +11,7 @@ function Firmware() {
     const [firmware_data, setfirmwaredata] = useState([]);
     const MySwal = withReactContent(Swal);
 
-    useEffect(() => {
+    const getFirmware = () => {
         fetch(`${process.env.REACT_APP_API_SERVER}/firmware`)
             .then(res => res.json())
             .then(
@@ -20,42 +20,48 @@ function Firmware() {
                     setfirmwaredata(result.data);
                 }
             )
+    }
+
+    useEffect(() => {
+        getFirmware()
     }, []);
 
-    const data_Delete = (e, firmware) => {
-        MySwal.fire({
-            title: 'Are you sure?',
-            icon: 'warning',
-            text: '是否要刪除 ' + firmware + ' ?',
-            showDenyButton: true,
-            confirmButtonText: "OK",
-            denyButtonText: "Cancel"
-        }).then((result) => {
-            console.log(result);
-            if (result.value) {
-                let requestOptions = {
-                    method: 'DELETE',
-                    redirect: 'follow'
-                };
+    const data_Delete = (e, id, firmware) => {
+        if (id !== '') {
+            MySwal.fire({
+                title: 'Are you sure?',
+                icon: 'warning',
+                text: '是否要刪除 ' + firmware + ' ?',
+                showDenyButton: true,
+                confirmButtonText: "OK",
+                denyButtonText: "Cancel"
+            }).then((result) => {
+                console.log(result);
+                if (result.value) {
+                    let requestOptions = {
+                        method: 'DELETE',
+                        redirect: 'follow'
+                    };
 
-                fetch(`${process.env.REACT_APP_API_SERVER}/firmware/${e.target.id}`, requestOptions)
-                    .then(res => res.json())
-                    .then(
-                        (result) => {
-                            console.log(result.data);
-                            if (result.status === 'OK') {
-                                MySwal.fire({
-                                    title: '刪除成功',
-                                    icon: 'success',
-                                    confirmButtonText: "OK",
-                                }).then(() => {
-                                    window.location.reload(false);
-                                })
+                    fetch(`${process.env.REACT_APP_API_SERVER}/firmware/${id}`, requestOptions)
+                        .then(res => res.json())
+                        .then(
+                            (result) => {
+                                console.log(result.data);
+                                if (result.status === 'OK') {
+                                    MySwal.fire({
+                                        title: '刪除成功',
+                                        icon: 'success',
+                                        confirmButtonText: "OK",
+                                    }).then(() => {
+                                        getFirmware()
+                                    })
+                                }
                             }
-                        }
-                    )
-            }
-        })
+                        )
+                }
+            })
+        }
     };
 
     return (
@@ -89,7 +95,11 @@ function Firmware() {
                                             <Button variant="warning" id={data.id}><FontAwesomeIcon icon={faEdit} /></Button>
                                         </Link>
                                     </td>
-                                    <td><Button variant="danger" id={data.id} onClick={(e) => data_Delete(e, data.firmware)}><FontAwesomeIcon icon={faTrashAlt} /></Button></td>
+                                    <td>
+                                        <Button variant="danger" id={data.id} onClick={(e) => data_Delete(e, data.id, data.firmware)}>
+                                            <FontAwesomeIcon icon={faTrashAlt} />
+                                        </Button>
+                                    </td>
                                 </tr>
                             )
                         })}
