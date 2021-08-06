@@ -6,14 +6,20 @@ import { faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import Title from '../../components/Title';
+import { getAuthToken } from "../../pages/auth/utils";
 
 function Model() {
     const [ModelData, setModelData] = useState([]);
     const MySwal = withReactContent(Swal);
 
     const getModel = () => {
-        fetch(`${process.env.REACT_APP_API_SERVER}/model`)
-            .then(res => res.json())
+        const token = getAuthToken();
+
+        fetch(`${process.env.REACT_APP_API_SERVER}/model`, {
+            headers: {
+                authorization: `Bearer ${token}`,
+            },
+        }).then(res => res.json())
             .then(
                 (result) => {
                     console.log(result.data);
@@ -21,11 +27,14 @@ function Model() {
                 }
             )
     }
+
     useEffect(() => {
         getModel()
     }, []);
 
     const data_Delete = (e, id, model) => {
+        const token = getAuthToken();
+        
         console.log(id);
         if (id !== '') {
             MySwal.fire({
@@ -40,7 +49,10 @@ function Model() {
                 if (result.value) {
                     let requestOptions = {
                         method: 'DELETE',
-                        redirect: 'follow'
+                        redirect: 'follow',
+                        headers: {
+                            authorization: `Bearer ${token}`,
+                        },
                     };
                     fetch(`${process.env.REACT_APP_API_SERVER}/model/${id}`, requestOptions)
                         .then(res => res.json())

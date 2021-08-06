@@ -7,6 +7,7 @@ import { faSave, faTimes, faUpload } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import Title from '../../components/Title';
+import { getAuthToken } from "../../pages/auth/utils";
 
 
 function CreateFirmware() {
@@ -34,6 +35,8 @@ function CreateFirmware() {
     const handleSubmit = (event) => {
         console.log(event);
         const form = event.currentTarget;
+        const token = getAuthToken();
+
         if (form.checkValidity() === false) {
             console.log('A');
 
@@ -55,7 +58,10 @@ function CreateFirmware() {
 
             fetch(`${process.env.REACT_APP_API_SERVER}/firmware`, {
                 method: 'POST',
-                body: data
+                body: data,
+                headers: {
+                    authorization: `Bearer ${token}`,
+                },
             }).then(res => res.json())
                 .then((res) => {
                     console.log(res);

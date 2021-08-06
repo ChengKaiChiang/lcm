@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import './css/FOTA.css';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+import { getAuthToken } from "../pages/auth/utils";
 
 function FirmwareUpdate() {
     const [count, setCount] = useState([]);
@@ -11,8 +12,13 @@ function FirmwareUpdate() {
     const MySwal = withReactContent(Swal);
 
     useEffect(() => {
-        fetch(`${process.env.REACT_APP_API_SERVER}/model`)
-            .then(res => res.json())
+        const token = getAuthToken();
+
+        fetch(`${process.env.REACT_APP_API_SERVER}/model`, {
+            headers: {
+                authorization: `Bearer ${token}`,
+            },
+        }).then(res => res.json())
             .then(
                 (result) => {
                     setmodeldata(result.data);

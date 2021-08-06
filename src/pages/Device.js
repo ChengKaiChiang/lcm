@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Table, Row, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import Title from '../components/Title';
+import { AuthContext } from "../pages/auth/context";
 
 function Device() {
     const [ModelData, setModelData] = useState([]);
     const MySwal = withReactContent(Swal);
+    const { user } = useContext(AuthContext);
 
     useEffect(() => {
         fetch(`${process.env.REACT_APP_API_SERVER}/device`)
@@ -98,7 +100,7 @@ function Device() {
                                 <th>Firmware</th>
                                 <th>Version</th>
                                 <th>Status</th>
-                                <th>Delete</th>
+                                {user && (<th>Delete</th>) }
                             </tr>
                         </thead>
                         <tbody className="text-center">
@@ -114,7 +116,9 @@ function Device() {
                                         <td>
                                             {test(data.status)}
                                         </td>
-                                        <td><Button variant="danger" id={data.id} onClick={(e) => data_Delete(e, data.device, data.position)}><FontAwesomeIcon icon={faTrashAlt} /></Button></td>
+                                        {
+                                            user && (<td><Button variant="danger" id={data.id} onClick={(e) => data_Delete(e, data.device, data.position)}><FontAwesomeIcon icon={faTrashAlt} /></Button></td>)
+                                        }
                                     </tr>
                                 )
                             })}

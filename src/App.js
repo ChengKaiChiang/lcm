@@ -12,6 +12,7 @@ import Model from './pages/Model/Model';
 import CreateModel from './pages/Model/CreateModel';
 import UpdateModel from './pages/Model/UpdateModel';
 import Device from './pages/Device';
+import Optical from './pages/Optical';
 
 import SignUp from './pages/SignUp';
 import SignIn from './pages/SignIn';
@@ -50,6 +51,7 @@ function App() {
             <Route exact path='/' component={LcmStatus} />
             <Route exact path='/Device' component={Device} />
             <Route exact path='/SignUp' component={SignUp} />
+            <Route exact path='/Optical' component={Optical} />
 
             {/* <PrivateRoute path="/Register">
               <Register />

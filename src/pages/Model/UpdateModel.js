@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { useParams } from "react-router-dom";
 import Title from '../../components/Title';
+import { getAuthToken } from "../../pages/auth/utils";
 
 function UpdateModel() {
     let { id, firmware } = useParams();
@@ -18,8 +19,13 @@ function UpdateModel() {
     const MySwal = withReactContent(Swal);
 
     useEffect(() => {
-        fetch(`${process.env.REACT_APP_API_SERVER}/model/${id}`)
-            .then(res => res.json())
+        const token = getAuthToken();
+
+        fetch(`${process.env.REACT_APP_API_SERVER}/model/${id}`, {
+            headers: {
+                authorization: `Bearer ${token}`,
+            },
+        }).then(res => res.json())
             .then(
                 (result) => {
                     setModelName(result.data.model);
@@ -28,8 +34,13 @@ function UpdateModel() {
     }, [id]);
 
     useEffect(() => {
-        fetch(`${process.env.REACT_APP_API_SERVER}/firmware`)
-            .then(res => res.json())
+        const token = getAuthToken();
+
+        fetch(`${process.env.REACT_APP_API_SERVER}/firmware`, {
+            headers: {
+                authorization: `Bearer ${token}`,
+            },
+        }).then(res => res.json())
             .then(
                 (result) => {
                     setFirmwareData(result.data);
@@ -39,9 +50,11 @@ function UpdateModel() {
 
     const save = () => {
         console.log(refSelect.current.value);
+        const token = getAuthToken();
 
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+        myHeaders.append("authorization", `Bearer ${token}`)
 
         let data = new URLSearchParams();
         data.append("Firmware", refSelect.current.value);

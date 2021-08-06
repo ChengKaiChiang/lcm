@@ -9,6 +9,7 @@ import withReactContent from 'sweetalert2-react-content';
 import { useParams } from "react-router-dom";
 import InputSpinner from 'react-bootstrap-input-spinner';
 import Title from '../../components/Title';
+import { getAuthToken } from "../../pages/auth/utils";
 
 function UpdateFirmware() {
     let { id, version } = useParams();
@@ -43,8 +44,12 @@ function UpdateFirmware() {
     }
 
     useEffect(() => {
-        fetch(`${process.env.REACT_APP_API_SERVER}/firmware/${id}`)
-            .then(res => res.json())
+        const token = getAuthToken();
+        fetch(`${process.env.REACT_APP_API_SERVER}/firmware/${id}`, {
+            headers: {
+                authorization: `Bearer ${token}`,
+            },
+        }).then(res => res.json())
             .then(
                 (result) => {
                     console.log(result.data);
@@ -57,9 +62,12 @@ function UpdateFirmware() {
     }, [id]);
 
     const save = () => {
+        const token = getAuthToken();
+
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-
+        myHeaders.append("authorization", `Bearer ${token}`);
+        
         let data = new URLSearchParams();
         data.append("File", FileName);
         data.append("Size", FirmwareSize);

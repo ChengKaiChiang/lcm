@@ -5,6 +5,7 @@ import { faSave, faTimes, faInfo } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import Title from '../../components/Title';
+import { getAuthToken } from "../../pages/auth/utils";
 
 function CreateModel() {
     const [validated, setValidated] = useState(false);
@@ -14,8 +15,13 @@ function CreateModel() {
     const refSelect = useRef(null);
 
     useEffect(() => {
-        fetch(`${process.env.REACT_APP_API_SERVER}/firmware`)
-            .then(res => res.json())
+        const token = getAuthToken();
+
+        fetch(`${process.env.REACT_APP_API_SERVER}/firmware`, {
+            headers: {
+                authorization: `Bearer ${token}`,
+            },
+        }).then(res => res.json())
             .then(
                 (result) => {
                     console.log(result.data)
@@ -28,6 +34,7 @@ function CreateModel() {
         console.log(event.target[0].value);
         console.log(refSelect.current.value);
 
+        const token = getAuthToken();
         const form = event.currentTarget;
         if (form.checkValidity() === false) {
             console.log('A');
@@ -46,7 +53,10 @@ function CreateModel() {
 
             fetch(`${process.env.REACT_APP_API_SERVER}/model`, {
                 method: 'POST',
-                body: data
+                body: data, 
+                headers: {
+                    authorization: `Bearer ${token}`,
+                },
             }).then(res => res.json())
                 .then((res) => {
                     console.log(res);

@@ -50,6 +50,10 @@ export default function MyNavbar() {
                             <Nav.Link>Device</Nav.Link>
                         </LinkContainer>
 
+                        <LinkContainer to="/Optical">
+                            <Nav.Link>Optical</Nav.Link>
+                        </LinkContainer>
+
                         {user && (<LinkContainer to="/Update">
                             <Nav.Link>Update</Nav.Link>
                         </LinkContainer>)}

@@ -6,14 +6,20 @@ import { faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import Title from '../../components/Title';
+import { getAuthToken } from "../../pages/auth/utils";
 
 function Firmware() {
     const [firmware_data, setfirmwaredata] = useState([]);
     const MySwal = withReactContent(Swal);
 
     const getFirmware = () => {
-        fetch(`${process.env.REACT_APP_API_SERVER}/firmware`)
-            .then(res => res.json())
+        const token = getAuthToken();
+
+        fetch(`${process.env.REACT_APP_API_SERVER}/firmware`,{
+            headers: {
+                authorization: `Bearer ${token}`,
+            },
+        }).then(res => res.json())
             .then(
                 (result) => {
                     console.log(result.data);
@@ -27,6 +33,8 @@ function Firmware() {
     }, []);
 
     const data_Delete = (e, id, firmware) => {
+        const token = getAuthToken();
+        
         if (id !== '') {
             MySwal.fire({
                 title: 'Are you sure?',
@@ -40,7 +48,10 @@ function Firmware() {
                 if (result.value) {
                     let requestOptions = {
                         method: 'DELETE',
-                        redirect: 'follow'
+                        redirect: 'follow',
+                        headers: {
+                            authorization: `Bearer ${token}`,
+                        },
                     };
 
                     fetch(`${process.env.REACT_APP_API_SERVER}/firmware/${id}`, requestOptions)
